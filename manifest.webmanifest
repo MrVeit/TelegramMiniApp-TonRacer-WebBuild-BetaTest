@@ -1,0 +1,7 @@
+{
+    "name": {{{ JSON.stringify(PRODUCT_NAME) }}},
+    "short_name": {{{ JSON.stringify(PRODUCT_NAME) }}},
+    "start_url": "index.html",
+    "display": "fullscreen",
+    "description": {{{ JSON.stringify(PRODUCT_DESCRIPTION) }}},
+  }
