@@ -141,13 +141,13 @@ function isMobile()
 }
 
 if (isMobile())
-{
-  var meta = document.createElement('meta');
-  
-  meta.name = 'viewport';
-  meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-  document.getElementsByTagName('head')[0].appendChild(meta);
-}
+  {
+    // Mobile device style: fill the whole browser client area with the game canvas:
+    var meta = document.createElement('meta');
+    meta.name = 'viewport';
+    meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+    document.getElementsByTagName('head')[0].appendChild(meta);
+  }
 
 progressBarContainer.style.display = "block";
 gameHeader.style.display = "block";
