@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    <!-- Title and Meta Tags -->
+    <title>hyyyyper</title>
+    <meta name="description" content="Complete missions, collect rewards, team up in squads and compete against each other for a part of the overall rewards.">
+    <meta property="og:image" content="https://hyyyyperbot.com/img/hyper_meta_cover.png">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://hyyyyperbot.com/img/hyper_meta_cover.png" />
+    
+    <!-- Favicon and Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Spartan:wght@700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://hyyyyperbot.com/img/hyper_meta_favicon.png" type="image/png">
+
+    <!-- Existing Unity WebGL Tags -->
+    <title>hyyyyper</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://sdk.panl.so/panl.js" data-app-id="P-LGDTW2LK"></script>
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <script src="https://static.sonartech.io/lib/1.0.0/sonar.js?appId=app_5795b4bb"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Mont Heavy';
+            src: url('TemplateData/Fonts/Mont Heavy.otf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: black;
+            flex-direction: column;
+        }
+
+        #game-header {
+          font-family: 'Mont Heavy', sans-serif;
+          font-size: 25px;
+          font-weight: 700;
+          color: white;
+          position: absolute;
+          top: 6.5vh;
+          z-index: 3;
+          text-transform: lowercase;
+          display: none;
+          line-height: 1;
+        }
+
+        #unity-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: url('TemplateData/Background.jpg') no-repeat center center;
+            background-size: cover;
+            overflow: hidden;
+        }
+
+        .progress-bar-container {
+            width: 80%;
+            position: absolute;
+            bottom: 4vh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 3;
+        }
+
+        .progress-bar-header {
+            font-family: 'Mont Heavy', sans-serif;
+            font-size: 15px;
+            color: white;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .progress-bar-background {
+            width: 100%;
+            height: 20px;
+            background: url('TemplateData/ProgressBar-Background.png') no-repeat center;
+            background-size: cover;
+            position: relative;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: url('TemplateData/ProgressBar-Fill.png') no-repeat center;
+            background-size: cover;
+            transition: width 0.5s ease;
+        }
+
+        #unity-canvas {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            position: absolute;
+            z-index: 2;
+        }
+
+        @media screen and (min-width: 410px), 
+              screen and (min-height: 800px)
+        {
+          #game-header {
+            font-size: 65px;
+          }
+
+          .progress-bar-header {
+            font-size: 30px;
+          }
+
+          .progress-bar-background {
+            height: 25px;
+          }
+        }
+        
+        @media screen and (min-aspect-ratio: 16/9), 
+                screen and (min-width: 1024px)
+        {
+          #unity-container {
+            background: url('TemplateData/DesktopBackground.jpg') no-repeat center center;
+            background-size: cover;
+          }
+
+          #game-header {
+            left: 5%;
+            font-size: 40px;
+            top: 6vh;
+          }
+
+          .progress-bar-container {
+            left: 5%;
+            width: 45%;
+            bottom: 8vh;
+            transform: none;
+          }
+
+          .progress-bar-header {
+            font-size: 14px;
+            text-align: left;
+            width: 100%;
+            margin-left: 0;
+          }
+
+          .progress-bar-background {
+            height: 15px;
+          }
+        }
+    </style>
+</head>
+<body>
+    <div id="unity-container">
+        <div id="game-header">hyyyyper</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-header">first loading is always long, please wait....</div>
+            <div class="progress-bar-background">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+        <canvas id="unity-canvas" width=355 height=590 tabindex="0"></canvas>
+        <div id="unity-warning"> </div>
+    </div>
+    <script src="buildConfigLoader.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
