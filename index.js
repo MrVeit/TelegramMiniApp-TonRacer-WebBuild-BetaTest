@@ -119,9 +119,6 @@ var unityInstanceRef;
 var unsubscribe;
 
 var container = document.querySelector("#unity-container");
-var progressBarContainer = document.querySelector(".progress-bar-container");
-var progressBar = document.querySelector(".progress-bar");
-var gameHeader = document.querySelector("#game-header");
 
 var buildUrl = "Build";
 var loaderUrl = buildUrl + "/TelegramMiniApp-TonRacer-WebBuild-BetaTest.loader.js";
@@ -140,9 +137,6 @@ function isMobile()
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 }
 
-progressBarContainer.style.display = "block";
-gameHeader.style.display = "block";
-
 var script = document.createElement("script");
 script.src = loaderUrl;
 
@@ -150,14 +144,11 @@ script.onload = () =>
 {
   createUnityInstance(document.querySelector("#unity-canvas"), config, (progress) =>
   {
-    progressBar.style.width = (progress * 100) + "%";
+
   })
   .then((unityInstance) =>
   {
     unityInstanceRef = unityInstance;
-
-    progressBarContainer.style.display = "none";
-    gameHeader.style.display = "none";
   })
   .catch((message) =>
   {
