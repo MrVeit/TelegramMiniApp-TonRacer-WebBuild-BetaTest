@@ -1,7 +1,15 @@
 {
-    "name": "Name",
-    "short_name": "Name",
+    "name": "hyyyyper",
+    "short_name": "hyyyyper",
     "start_url": "index.html",
     "display": "fullscreen",
-    "description": "Name"
+    "background_color": "#000009",
+    "theme_color": "#000",
+    "description": "",
+    "icons": [{
+      "src": "TemplateData/icons/unity-logo-dark.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }]
   }
