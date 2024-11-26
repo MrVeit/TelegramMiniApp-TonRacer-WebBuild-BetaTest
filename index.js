@@ -1,128 +1,197 @@
-window.addEventListener("load", function () 
-{
-    if ("serviceWorker" in navigator)
-    {
-      navigator.serviceWorker.register("ServiceWorker.js");
-    }
-  });
-
-  var unityInstanceRef;
-  var unsubscribe;
-  var container = document.querySelector("#unity-container");
-  var canvas = document.querySelector("#unity-canvas");
-  var loadingBar = document.querySelector("#unity-loading-bar");
-  var progressBarFull = document.querySelector("#unity-progress-bar-full");
-  var warningBanner = document.querySelector("#unity-warning");
-
-  // Shows a temporary message banner/ribbon for a few seconds, or
-  // a permanent error message on top of the canvas if type=='error'.
-  // If type=='warning', a yellow highlight color is used.
-  // Modify or remove this function to customize the visually presented
-  // way that non-critical warnings and error messages are presented to the
-  // user.
-  function unityShowBanner(msg, type) 
-  {
-    function updateBannerVisibility()
-    {
-      warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-    }
-
-    var div = document.createElement('div');
-    div.innerHTML = msg;
-    warningBanner.appendChild(div);
-
-    if (type == 'error')
-    {
-      div.style = 'background: red; padding: 10px;';
-    }
-    else
-    {
-      if (type == 'warning')
+document.addEventListener("DOMContentLoaded", function () {
+  window.BuildInfoLoaded
+      .then(() =>
       {
-        div.style = 'background: yellow; padding: 10px;';
+          console.log(`App version ${window.BuildInfo.version}.${window.BuildInfo.buildNumber}`);
+      })
+      .catch(() =>
+      {
+          console.error(`Failed to load Build info`);
+      });
+});
+
+var TryRegisterServiceWorker = function () {
+  if ('serviceWorker' in navigator) {
+      let sWorkerFile = 'serviceWorker.js';
+
+      let RegisterWorker = function () {
+
+          console.log("Registering new worker");
+
+          navigator.serviceWorker.register(sWorkerFile)
+          .then((registration) =>
+          {
+            console.log("Service Worker registered");
+
+            registration.active?.postMessage({
+              type: "INIT_BUILD_INFO",
+              payload: window.BuildInfo
+            });
+          })
+          .catch((error) =>
+          {
+            console.error("Service Worker registration failed:", error);
+          });
       }
 
-      setTimeout(function()
-      {
-        warningBanner.removeChild(div);
-        updateBannerVisibility();
-      }, 5000);
-    }
+      let sWorker = navigator.serviceWorker.controller;
 
-    updateBannerVisibility();
+      if (!sWorker) {
+          RegisterWorker();
+      }
   }
+};
 
-  var buildUrl = "Build";
-  var loaderUrl = buildUrl + "/TelegramMiniApp-TonRacer-WebBuild-BetaTest.loader.js";
-  var config = {
+var TryUnregisterServiceWorker = function (loadPageCallback) {
+  if ('serviceWorker' in navigator)
+  {
+      let sWorkerFile = 'serviceWorker.js';
+
+      let UnregisterWorkers = function ()
+      {
+          console.log("Unregister old workers");
+          
+          navigator.serviceWorker.getRegistration(
+            sWorkerFile).then(function (registration) {
+              if (registration)
+              {
+                  registration.unregister().then(() =>
+                  {
+                      location.reload(true);
+                  });
+              }
+          });
+      };
+
+      let sWorker = navigator.serviceWorker.controller;
+
+      if (sWorker)
+      {
+          navigator.serviceWorker.addEventListener('message', (event) =>
+          {
+              if (event.data.title === 'ReplaceWorker')
+              {
+                  UnregisterWorkers();
+              }
+              else if (event.data.title === 'SameVersion')
+              {
+                  loadPageCallback();
+              }
+          });
+          sWorker.postMessage({ title: 'VersionTest', version: serviceWorkerVersion });
+      }
+      else
+      {
+          loadPageCallback();
+      }
+  }
+};
+
+var ForceUnregisterServiceWorker = function ()
+{
+  if ('serviceWorker' in navigator)
+  {
+      let sWorkerFile = '/serviceWorker.js';
+
+      let UnregisterWorkers = function ()
+      {
+          console.log("Unregister old workers");
+          navigator.serviceWorker.getRegistration(
+            sWorkerFile).then(function (registration)
+          {
+              if (registration)
+              {
+                  registration.unregister().then(() =>
+                  {
+                      location.reload(true);
+                  });
+              }
+          });
+      };
+
+      UnregisterWorkers();
+  }
+};
+
+TryRegisterServiceWorker();
+
+var unityInstanceRef;
+var unsubscribe;
+
+var container = document.querySelector("#unity-container");
+var progressBarContainer = document.querySelector(".progress-bar-container");
+var progressBar = document.querySelector(".progress-bar");
+var gameHeader = document.querySelector("#game-header");
+
+var buildUrl = "Build";
+var loaderUrl = buildUrl + "/TelegramMiniApp-TonRacer-WebBuild-BetaTest.loader.js";
+var config = {
     dataUrl: buildUrl + "/TelegramMiniApp-TonRacer-WebBuild-BetaTest.data.unityweb",
     frameworkUrl: buildUrl + "/TelegramMiniApp-TonRacer-WebBuild-BetaTest.framework.js.unityweb",
     codeUrl: buildUrl + "/TelegramMiniApp-TonRacer-WebBuild-BetaTest.wasm.unityweb",
     streamingAssetsUrl: "StreamingAssets",
     companyName: "hyyyyper",
     productName: "hyyyyper",
-    productVersion: "1.0",
-    showBanner: unityShowBanner,
-  };
+    productVersion: "1.0"
+};
 
-  // By default Unity keeps WebGL canvas render target size matched with
-  // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-  // Set this to false if you want to decouple this synchronization from
-  // happening inside the engine, and you would instead like to size up
-  // the canvas DOM size and WebGL render target sizes yourself.
-  // config.matchWebGLToCanvasSize = false;
+function isMobile()
+{
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
 
-  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+if (isMobile())
+{
+  var meta = document.createElement('meta');
+  
+  meta.name = 'viewport';
+  meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+  document.getElementsByTagName('head')[0].appendChild(meta);
+}
+
+progressBarContainer.style.display = "block";
+gameHeader.style.display = "block";
+
+var script = document.createElement("script");
+script.src = loaderUrl;
+
+script.onload = () =>
+{
+  createUnityInstance(document.querySelector("#unity-canvas"), config, (progress) =>
   {
-    // Mobile device style: fill the whole browser client area with the game canvas:
-    var meta = document.createElement('meta');
-    meta.name = 'viewport';
-    meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-    document.getElementsByTagName('head')[0].appendChild(meta);
+    progressBar.style.width = (progress * 100) + "%";
+  })
+  .then((unityInstance) =>
+  {
+    unityInstanceRef = unityInstance;
+
+    progressBarContainer.style.display = "none";
+    gameHeader.style.display = "none";
+  })
+  .catch((message) =>
+  {
+    console.error(message);
+  });
+};
+
+document.body.appendChild(script);
+
+window.addEventListener('load', function () 
+{
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+
+  console.log("Telegram Web App has been expanded to full screen");
+
+  var version = Telegram.WebApp.version;
+  var versionFloat = parseFloat(version);
+
+  if (versionFloat >= 7.7) 
+  {
+    Telegram.WebApp.disableVerticalSwipes();
+
+    console.log('Activating vertical swipe disable');
   }
 
-  loadingBar.style.display = "block";
-
-  var script = document.createElement("script");
-  script.src = loaderUrl;
-
-  script.onload = () => 
-  {
-    createUnityInstance(canvas, config, (progress) => 
-    {
-      progressBarFull.style.width = 100 * progress + "%";
-    }
-    ).then((unityInstance) => 
-    {
-      unityInstanceRef = unityInstance;
-      loadingBar.style.display = "none";
-    }
-    ).catch((message) => 
-    {
-      alert(message);
-    });
-  };
-
-  document.body.appendChild(script);
-
-  window.addEventListener('load', function ()
-  {
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
-
-    console.log("Telegram Web App has been expanded to full screen");
-
-    var version = Telegram.WebApp.version;
-    var versionFloat = parseFloat(version);
-
-    if (versionFloat >= 7.7)
-    {
-        Telegram.WebApp.disableVerticalSwipes();
-        
-        console.log('Activating vertical swipe disable');
-    }
-
-    console.log(`Telegram Web App opened with version: ${version}`);
-    console.log(`Telegram Web App checked` +
-        `latest version status with result: ${Telegram.WebApp.isVersionAtLeast(version)}`);
-  });
+  console.log(`Telegram Web App opened with version: ${version}`);
+});
