@@ -33,9 +33,6 @@
         body, html {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            flex-direction: column;
         }
 
         #game-header {
@@ -54,8 +51,14 @@
         #unity-container {
             width: 100%; 
             height: 100%;
-            position: fixed; 
+            position: fixed;
             background: url('TemplateData/Background.jpg') no-repeat center center;
+        }
+
+        #unity-canvas {
+            width: 100%;
+            height: 100%;
+            z-index: 2;
         }
 
         .progress-bar-container {
@@ -93,12 +96,6 @@
             background: url('TemplateData/ProgressBar-Fill.png') no-repeat center;
             background-size: cover;
             transition: width 0.5s ease;
-        }
-
-        #unity-canvas {
-            width: 100%;
-            height: 100%;
-            z-index: 2;
         }
         
         @media screen and (min-aspect-ratio: 16/9), 
