@@ -6,7 +6,7 @@ let buildVersion = "default";
 
 self.addEventListener("message", (event) =>
 {
-  if (eventData && event.data.type == "INIT_BUILD_INFO")
+  if (event && event.data.type == "INIT_BUILD_INFO")
   {
     const buildInfo = event.data.payload;
 
@@ -22,7 +22,7 @@ self.addEventListener("message", (event) =>
 
 self.addEventListener("install", function(event)
 {
-  console.log('service worker: install ' + version);
+  console.log('service worker: install ' + buildVersion);
 
   event.waitUntil(
     caches.open(cacheName).then((cache) =>
@@ -53,7 +53,7 @@ self.addEventListener("install", function(event)
   
 self.addEventListener('activate', function(event) 
 {
-  console.log('service worker: Activate ' + cacheName);
+  console.log('service worker: Activate ' + buildVersion);
 
   event.waitUntil(
       caches.keys().then(function(keyList)
@@ -77,7 +77,7 @@ self.addEventListener('activate', function(event)
   
   self.addEventListener('message', function(event)
   {
-    console.log('service worker: Message ' + version);
+    console.log('service worker: Message ' + buildVersion);
 
     if (event.data.title && event.data.title === 'VersionTest')
     {
