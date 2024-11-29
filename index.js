@@ -164,6 +164,7 @@ script.onload = () =>
   .then((unityInstance) =>
   {
     unityInstanceRef = unityInstance;
+    window.unityInstance = unityInstance;
 
     progressBarContainer.style.display = "none";
     gameHeader.style.display = "none";
